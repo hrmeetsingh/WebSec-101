@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#twitter").click(function(){
+        $.get("https://twitter.com/robots.txt", function(data, status){
+            $("#holder").html(data);
+        });
+    });
+
+    $("#ip").click(function(){
+        $.get("http://icanhazip.com", function(data, status){
+            $("#holder").html(data);
+        });
+    });
+
+});
+</script>
+</head>
+<body>
+
+<button id="twitter">Get robots.txt from Twitter.com</button>
+   
+<button id="ip">Get IP Address</button>
+<pre><div id="holder" name="holder"></div></pre>
+
+</body>
+</html>
